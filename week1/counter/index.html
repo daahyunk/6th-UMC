@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counter</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  .counter-container {
+    text-align: center;
+  }
+  .counter {
+    font-size: 5em;
+    margin: 0.5em;
+  }
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .button {
+    border: 1px solid #000;
+    background: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  .button:hover {
+    background: #f0f0f0;
+  }
+</style>
+</head>
+<body>
+    <div class="counter-container">
+        <div id="counter" class="counter">0</div>
+        <div class="buttons">
+          <button class="button" id="increase" onclick="increment()">+1</button>
+          <button class="button" id="decrease" onclick="decrement()">-1</button>
+        </div>
+      </div>
+      <script>
+        let count = 0;
+        const counterElement = document.getElementById('counter');
+        const increase = document.getElementById("increase");
+        const decrease = document.getElementById("decrease");
+
+        console.log(counter);
+        console.log(increase);
+        console.log(decrease);
+
+        
+        function increment() {
+          count++;
+          counterElement.textContent = count;
+          console.log("increase가 클릭됨:", count);
+        }
+        
+        function decrement() {
+          count--;
+          counterElement.textContent = count;
+          console.log("decrease가 클릭됨:", count);
+        }
+      </script>
+</body>
+</html>

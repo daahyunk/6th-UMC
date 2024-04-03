@@ -1,0 +1,71 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #E1E7F5;
+}
+
+header {
+    margin-top: 100px;
+    text-align: center;
+    font-size: 15px;
+}
+
+#app {
+    width: 80%;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+#newTask {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #000000;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #B5D2ED;
+}
+
+
+h2 {
+    color: #333;
+    border-bottom: 2px solid #B5D2ED;
+    padding-bottom: 5px;
+}
+
+#lists-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+#todo-section, #done-section {
+    width: 48%;
+    font-size: 15px;
+}
+
+li button {
+    padding: 5px 10px;
+    background-color: #B5D2ED;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+li button:hover {
+    background-color: #D5E4F2;
+}

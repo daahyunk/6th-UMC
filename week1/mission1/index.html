@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="container">
+    <form id="signup-form">
+        <h2>회원 가입</h2>
+        <div class="title-underline"></div>
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="age">나이</label>
+            <input type="text" id="age" required>
+            <small id="age-error-message"></small>
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" required>
+            <small id="password-error-message"></small>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">비밀번호 확인</label>
+            <input type="password" id="confirm-password" required>
+            <small id="confirm-password-error-message"></small>
+        </div>
+        <div id="submit-button-container">
+            <button id="submit-button" type="submit">가입하기</button>
+        </div>
+        
+    </form>
+</div>
+<script src="./index.js"></script>
+</body>
+</html>
