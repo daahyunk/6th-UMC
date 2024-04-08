@@ -1,0 +1,10 @@
+.app-container {
+  background-color: #232649; /* 남색 배경 */
+  min-height: 100vh; /* 최소 높이를 화면 전체 크기로 설정 */
+  display: flex; /* flexbox 레이아웃 사용 */
+  flex-wrap: wrap; /* 요소들이 경계에 도달하면 다음 줄로 넘어감 */
+  justify-content: center; /* 중앙 정렬 */
+  align-items: flex-start; /* 상단 정렬 */
+  padding: 16px; /* 여백 추가 */
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
