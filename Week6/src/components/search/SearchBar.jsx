@@ -9,7 +9,6 @@ const SearchBarContainer = styled.div`
   padding: 20px;
   color: white;
   background-color: #212348;
-
   padding-bottom: 150px;
 `;
 
@@ -97,63 +96,65 @@ const MovieRating = styled.div`
 `;
 
 const SearchBar = () => {
-    const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
-  
-    const handleInputChange = (e) => {
-      setQuery(e.target.value);
-    };
-  
-    const handleSearch = async () => {
-      if (query.trim() === '') return;
-  
-      try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/search/movie?api_key=42b8be23d71ac7e304fe02f1f4e720da&query=${query}&language=ko-KR`
-        );
-        setResults(response.data.results);
-      } catch (error) {
-        console.error('Error fetching movie data:', error);
-      }
-    };
-  
-    useEffect(() => {
-      if (query.trim() !== '') {
-        const timeoutId = setTimeout(() => {
-          handleSearch();
-        }, 500);
-        return () => clearTimeout(timeoutId);
-      } else {
-        setResults([]);
-      }
-    }, [query]);
-  
-    return (
-      <SearchBarContainer>
-        <Title>🎥 Find your Movies!</Title>
-        <SearchInput
-          type="text"
-          placeholder="영화를 검색해 보세요!"
-          value={query}
-          onChange={handleInputChange}
-        />
-        <SearchButton onClick={handleSearch}>Search</SearchButton>
-        {query.trim() !== '' && results.length > 0 && (
-          <ResultsContainer>
-            {results.map((movie) => (
-              <MovieCard key={movie.id}>
-                <MovieImage
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                />
-                <MovieTitle>{movie.title}</MovieTitle>
-                <MovieRating>⭐ {movie.vote_average}</MovieRating>
-              </MovieCard>
-            ))}
-          </ResultsContainer>
-        )}
-      </SearchBarContainer>
-    );
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
   };
-  
-  export default SearchBar;
+
+  const handleSearch = async () => {
+    if (query.trim() === '') return;
+
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/search/movie?api_key=42b8be23d71ac7e304fe02f1f4e720da&query=${query}&language=ko-KR`
+      );
+      setResults(response.data.results);
+    } catch (error) {
+      console.error('Error fetching movie data:', error);
+    }
+  };
+
+  useEffect(() => {
+    // 검색어가 변경될 때마다 실행
+    const timeoutId = setTimeout(() => {
+      if (query.trim() !== '') {
+        handleSearch(); // 검색어가 비어있지 않으면 검색 함수 호출
+      } else {
+        setResults([]); // 검색어가 비어있으면 결과 초기화
+      }
+    }, 500); // 500ms 디바운스 적용
+
+    return () => clearTimeout(timeoutId); // 컴포넌트 언마운트 시 타이머 정리
+  }, [query]); // 의존성 배열에 query 추가
+
+  return (
+    <SearchBarContainer>
+      <Title>🎥 Find your Movies!</Title>
+      <SearchInput
+        type="text"
+        placeholder="영화를 검색해 보세요!"
+        value={query}
+        onChange={handleInputChange}
+      />
+      <SearchButton onClick={handleSearch}>Search</SearchButton>
+      {query.trim() !== '' && results.length > 0 && (
+        <ResultsContainer>
+          {results.map((movie) => (
+            <MovieCard key={movie.id}>
+              <MovieImage
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+              />
+              <MovieTitle>{movie.title}</MovieTitle>
+              <MovieRating>⭐ {movie.vote_average}</MovieRating>
+            </MovieCard>
+          ))}
+        </ResultsContainer>
+      )}
+    </SearchBarContainer>
+  );
+};
+
+export default SearchBar;
