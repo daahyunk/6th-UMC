@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const SearchBarContainer = styled.div`
   display: flex;
@@ -67,12 +68,19 @@ const ResultsContainer = styled.div`
 `;
 
 const MovieCard = styled.div`
+  position: relative;
   width: 250px;
   margin: 10px;
   text-align: center;
   color: white;
   background-color: #373B66;
   border-radius: 5px;
+  cursor: pointer;
+  overflow: hidden;
+
+  &:hover .overlay {
+    opacity: 1;
+  }
 `;
 
 const MovieImage = styled.img`
@@ -95,9 +103,52 @@ const MovieRating = styled.div`
   margin-bottom: 10px;
 `;
 
+const Loader = styled.div`
+  color: white;
+  margin-top: 20px;
+  font-size: 18px;
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;  /* 왼쪽 정렬로 변경 */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  padding: 20px;
+`;
+
+const OverlayTitle = styled.div`
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: left;  /* 왼쪽 정렬로 변경 */
+`;
+
+const OverlaySynopsis = styled.div`
+  font-size: 14px;
+  max-height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 5; /* 표시할 줄 수 */
+  -webkit-box-orient: vertical;
+  text-align: left;  /* 왼쪽 정렬로 변경 */
+`;
+
 const SearchBar = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
@@ -106,6 +157,7 @@ const SearchBar = () => {
   const handleSearch = async () => {
     if (query.trim() === '') return;
 
+    setLoading(true);
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/search/movie?api_key=42b8be23d71ac7e304fe02f1f4e720da&query=${query}&language=ko-KR`
@@ -113,21 +165,26 @@ const SearchBar = () => {
       setResults(response.data.results);
     } catch (error) {
       console.error('Error fetching movie data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // 검색어가 변경될 때마다 실행
     const timeoutId = setTimeout(() => {
       if (query.trim() !== '') {
-        handleSearch(); // 검색어가 비어있지 않으면 검색 함수 호출
+        handleSearch();
       } else {
-        setResults([]); // 검색어가 비어있으면 결과 초기화
+        setResults([]);
       }
-    }, 500); // 500ms 디바운스 적용
+    }, 500);
 
-    return () => clearTimeout(timeoutId); // 컴포넌트 언마운트 시 타이머 정리
-  }, [query]); // 의존성 배열에 query 추가
+    return () => clearTimeout(timeoutId);
+  }, [query]);
+
+  const handleMovieClick = (movieId) => {
+    navigate(`/movie/${movieId}`);
+  };
 
   return (
     <SearchBarContainer>
@@ -139,19 +196,27 @@ const SearchBar = () => {
         onChange={handleInputChange}
       />
       <SearchButton onClick={handleSearch}>Search</SearchButton>
-      {query.trim() !== '' && results.length > 0 && (
-        <ResultsContainer>
-          {results.map((movie) => (
-            <MovieCard key={movie.id}>
-              <MovieImage
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-              />
-              <MovieTitle>{movie.title}</MovieTitle>
-              <MovieRating>⭐ {movie.vote_average}</MovieRating>
-            </MovieCard>
-          ))}
-        </ResultsContainer>
+      {loading ? (
+        <Loader>데이터를 받아오는 중입니다...</Loader>
+      ) : (
+        query.trim() !== '' && results.length > 0 && (
+          <ResultsContainer>
+            {results.map((movie) => (
+              <MovieCard key={movie.id} onClick={() => handleMovieClick(movie.id)}>
+                <MovieImage
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                />
+                <MovieTitle>{movie.title}</MovieTitle>
+                <MovieRating>⭐ {movie.vote_average}</MovieRating>
+                <Overlay className="overlay">
+                  <OverlayTitle>{movie.title}</OverlayTitle>
+                  <OverlaySynopsis>{movie.overview || "줄거리 정보가 없습니다."}</OverlaySynopsis>
+                </Overlay>
+              </MovieCard>
+            ))}
+          </ResultsContainer>
+        )
       )}
     </SearchBarContainer>
   );

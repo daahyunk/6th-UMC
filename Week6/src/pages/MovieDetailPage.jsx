@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { BeatLoader } from 'react-spinners';
-
+import axios from 'axios';
 
 const Background = styled.div`
   position: fixed;
@@ -33,6 +33,8 @@ const Container = styled.div`
   height: 100vh;
   width: 100%;
   position: relative;
+  padding-top: 20vh;
+  padding-bottom: 21vh;
   z-index: 1;
 `;
 
@@ -84,41 +86,78 @@ const LoaderContainer = styled.div`
   background-color: #212348;
 `;
 
-function MovieDetailPage() {
-  const { movieTitle } = useParams();
+const CastContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #1a1a40;
+  margin-top: 20px;
+`;
+
+const CastTitle = styled.h2`
+  font-size: 1.5rem;
+  color: white;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+`;
+
+const CastGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+`;
+
+const CastCard = styled.div`
+  width: 150px;
+  margin: 10px;
+  text-align: center;
+  color: white;
+`;
+
+const CastImage = styled.img`
+  width: 100%;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const CastName = styled.div`
+  font-size: 16px;
+  margin-top: 5px;
+  font-weight: 600;
+`;
+
+const CastRole = styled.div`
+  font-size: 14px;
+  color: yellow;
+  margin-top: 3px;
+  margin-bottom: 10px;
+`;
+
+const MovieDetailPage = () => {
+  const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
+  const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovie = async () => {
-      const encodedTitle = encodeURIComponent(movieTitle);
-      const base_url = `https://api.themoviedb.org/3/search/movie?api_key=42b8be23d71ac7e304fe02f1f4e720da&query=${encodedTitle}&page=1`;
-  
       try {
-        const koResponse = await fetch(`${base_url}&language=ko-KR`);
-        const koData = await koResponse.json();
-        const enResponse = await fetch(`${base_url}&language=en-US`);
-        const enData = await enResponse.json();
-  
-        if (koData.results.length > 0 && enData.results.length > 0) {
-          const movieDetails = {
-            ...koData.results[0],
-            title: enData.results[0].title 
-          };
-          setMovie(movieDetails);
-        } else {
-          navigate("/not-found");
-        }
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=42b8be23d71ac7e304fe02f1f4e720da&language=ko-KR`);
+        const castResponse = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=42b8be23d71ac7e304fe02f1f4e720da&language=ko-KR`);
+        setMovie(response.data);
+        setCast(castResponse.data.cast);
       } catch (error) {
         navigate("/not-found");
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchMovie();
-  }, [movieTitle, navigate]);
+  }, [movieId, navigate]);
 
   if (loading) {
     return <LoaderContainer><BeatLoader color="#ffffff" size={15} /></LoaderContainer>;
@@ -147,6 +186,21 @@ function MovieDetailPage() {
           </Details>
         </Content>
       </Container>
+      <CastContainer>
+        <CastTitle>출연진 및 제작진</CastTitle>
+        <CastGrid>
+          {cast.map(member => (
+            <CastCard key={member.id}>
+              <CastImage
+                src={member.profile_path ? `https://image.tmdb.org/t/p/w500${member.profile_path}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz7ztleRwzXhFdiwBYqZ8cib9RvEsukVVUS3niN1YQ&s'}
+                alt={member.name}
+              />
+              <CastName>{member.name}</CastName>
+              <CastRole>{member.character}</CastRole>
+            </CastCard>
+          ))}
+        </CastGrid>
+      </CastContainer>
     </>
   );
 }

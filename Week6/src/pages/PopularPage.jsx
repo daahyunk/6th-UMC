@@ -17,16 +17,15 @@ const PopularPage = () => {
   return (
     <Container>
       {movies.map(movie => (
-        <Link to={`/movie/${encodeURIComponent(movie.title)}`} key={movie.id}>
-        <MovieCard>
-          <Image src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
-          <Info>
-            <Title>{movie.title}</Title>
-            <Rating>⭐ {movie.vote_average.toFixed(1)}</Rating>
-          </Info>
-        </MovieCard>
-      </Link>
-      
+        <Link to={`/movie/${movie.id}`} key={movie.id}>
+          <MovieCard>
+            <Image src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
+            <Info>
+              <Title>{movie.title}</Title>
+              <Rating>⭐ {movie.vote_average.toFixed(1)}</Rating>
+            </Info>
+          </MovieCard>
+        </Link>
       ))}
     </Container>
   );
