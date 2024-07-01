@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive';
 import MenuIcon from '../assets/Menu.png';
+import ShareKakao from "../api/ShareKakao";
 
 const NavbarContainer = styled.nav`
   display: flex;
@@ -106,6 +107,7 @@ const Navbar = () => {
     <>
       <NavbarContainer>
         <Logo><NavLink to="/" style={{ color: 'white' }}>UMC Movie</NavLink></Logo>
+        <ShareKakao/>
         <NavItems>
           <NavLink to="/popular" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>Popular</NavLink>
           <NavLink to="/nowplaying" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>Now Playing</NavLink>
