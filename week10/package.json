@@ -16,7 +16,8 @@
     "react-responsive": "^10.0.0",
     "react-router": "^6.24.0",
     "react-router-dom": "^6.24.0",
-    "react-spinners": "^0.14.1"
+    "react-spinners": "^0.14.1",
+    "styled-components": "^6.1.11"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
