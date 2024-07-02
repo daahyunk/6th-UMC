@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { useMediaQuery } from 'react-responsive';
 import MenuIcon from '../assets/Menu.png';
 import ShareKakao from "../api/ShareKakao";
+import getRedirectURI from '../components/RedirectURI'; // Redirect URI 가져오기
+import useUser from '../components/hooks/useUser'; // useUser 훅을 가져옵니다
 
 const NavbarContainer = styled.nav`
   display: flex;
@@ -98,15 +100,19 @@ const SidebarNavLink = styled(NavLink)`
 `;
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const { user, loading } = useUser();
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 768px)' });
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
+    const kakaoRestAPI = import.meta.env.VITE_REST_API;
+    const logoutRedirectURI = getRedirectURI();
+    const kakaoLogoutURL = `https://kauth.kakao.com/oauth/logout?client_id=${kakaoRestAPI}&logout_redirect_uri=${logoutRedirectURI}`;
+
     localStorage.removeItem('token');
-    navigate('/');
-    setSidebarOpen(false);
+    localStorage.removeItem('kakao_token');
+    localStorage.removeItem('nickname');
+    window.location.href = kakaoLogoutURL; // 로그아웃 URL로 리디렉션
   };
 
   const toggleSidebar = () => {
@@ -125,7 +131,7 @@ const Navbar = () => {
           <NavLink to="/nowplaying" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>Now Playing</NavLink>
           <NavLink to="/toprated" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>Top Rated</NavLink>
           <NavLink to="/upcoming" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>Up Coming</NavLink>
-          {!token ? (
+          {!loading && !user ? (
             <>
               <NavLink to="/signup" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>회원가입</NavLink>
               <NavLink to="/login" style={({ isActive }) => isActive ? { color: 'yellow' } : null}>로그인</NavLink>
@@ -146,7 +152,7 @@ const Navbar = () => {
           <SidebarNavLink to="/nowplaying" onClick={() => setSidebarOpen(false)}>Now Playing</SidebarNavLink>
           <SidebarNavLink to="/toprated" onClick={() => setSidebarOpen(false)}>Top Rated</SidebarNavLink>
           <SidebarNavLink to="/upcoming" onClick={() => setSidebarOpen(false)}>Up Coming</SidebarNavLink>
-          {!token ? (
+          {!loading && !user ? (
             <>
               <SidebarNavLink to="/signup" onClick={() => setSidebarOpen(false)}>회원가입</SidebarNavLink>
               <SidebarNavLink to="/login" onClick={() => setSidebarOpen(false)}>로그인</SidebarNavLink>

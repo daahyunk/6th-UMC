@@ -27,6 +27,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<LogIn />} />
+          <Route path="/login/auth" element={<LogIn />} />
         </Routes>
         <Footer />
       </div>

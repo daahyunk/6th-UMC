@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import LoginKakao from './LoginKakao'; // LoginKakao 컴포넌트를 import 합니다
+import getRedirectURI from '../components/RedirectURI'; // Redirect URI 가져오기
 
 const Container = styled.div`
   display: flex;
@@ -100,6 +102,52 @@ const LogInPage = () => {
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // useLocation 훅 추가
+
+  // useEffect 훅을 사용하여 URL의 인가 코드를 처리
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search); // URL 검색 파라미터 가져오기
+    const code = searchParams.get('code'); // 인가 코드 추출
+    const kakaoRestAPI = import.meta.env.VITE_REST_API;
+    const redirectURI = getRedirectURI();
+
+    if (code) {
+      axios.post(
+        'https://kauth.kakao.com/oauth/token',
+        {},
+        {
+          params: {
+            grant_type: 'authorization_code',
+            client_id: kakaoRestAPI,
+            redirect_uri: redirectURI,
+            code,
+          },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      )
+      .then(response => {
+        const { access_token } = response.data;
+        localStorage.setItem('kakao_token', access_token);
+        return axios.get('https://kapi.kakao.com/v2/user/me', {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+          },
+        });
+      })
+      .then(response => {
+        const { nickname } = response.data.properties;
+        localStorage.setItem('nickname', nickname);
+        localStorage.setItem('token', 'kakao'); // 카카오 로그인 토큰 설정
+        navigate('/');
+      })
+      .catch(error => {
+        console.error('Login failed', error);
+      });
+    }
+  }, [location.search, navigate]); // location.search와 navigate를 의존성 배열에 추가
 
   const validateForm = (data) => {
     const newErrors = {};
@@ -158,6 +206,7 @@ const LogInPage = () => {
         />
         {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
         <SubmitButton type="submit" disabled={!isValid}>로그인</SubmitButton>
+        <LoginKakao /> {/* 카카오 로그인 버튼 추가 */}
       </Form>
     </Container>
   );
